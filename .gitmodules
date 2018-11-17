@@ -1,0 +1,3 @@
+[submodule "Assets/Scripts/ROSBridgeSharp"]
+	path = Assets/Scripts/ROSBridgeSharp
+	url = git@github.com:AtsushiSaito/ROSBridgeSharp.git
