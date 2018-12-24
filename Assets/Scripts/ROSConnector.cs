@@ -16,10 +16,6 @@ public class ROSConnector : MonoBehaviour
     public GameObject DialogWindow;
     public Text DialogText;
 
-    readonly float TimeOut = 3000;
-    float nowTime = 0;
-    bool RCConnectFlag = false;
-
     void ToggleButton()
     {
         DisconnectButton.interactable = !DisconnectButton.interactable;
@@ -49,31 +45,6 @@ public class ROSConnector : MonoBehaviour
         ConnectButton.colors = ConnectColor;
     }
 
-    void Update()
-    {
-        // RBSocket側で接続フラグが有効になった場合
-        if (RBSocket.Instance.IsConnected && RCConnectFlag)
-        {
-            AddDialogMessage("Connection Successful.");
-            ToggleButton();
-            RCConnectFlag = false;
-        }
-        // ROSConnector内で接続フラグが立っている時
-        if (RCConnectFlag)
-        {
-            // 指定されたタイムアウト時間に達した場合
-            if (nowTime > TimeOut)
-            {
-                AddDialogMessage("Connection Error.");
-                RCConnectFlag = false; //タイムアウトしたため、ROSConnector内の接続フラグを無効にする。
-            }
-            else
-            {
-                nowTime += Time.deltaTime * 1000; // フレーム時間を足していく。
-            }
-        }
-    }
-
     public void DisconnectionButton()
     {
         if (RBSocket.Instance.IsConnected)
@@ -97,9 +68,17 @@ public class ROSConnector : MonoBehaviour
 
         if (!RBSocket.Instance.IsConnected)
         {
+
             RBSocket.Instance.Connect();
-            nowTime = 0;
-            RCConnectFlag = true;
+            if (RBSocket.Instance.IsConnected)
+            {
+                AddDialogMessage("Connection Successful.");
+                ToggleButton();
+            }
+            else
+            {
+                AddDialogMessage("Connection Error.");
+            }
         }
     }
 }
