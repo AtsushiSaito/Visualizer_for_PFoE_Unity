@@ -49,3 +49,4 @@ Thumbs.db
 
 #python bytecode cache, for some plugins.
 *.pyc
+ProjectSettings/UnityConnectSettings.asset
