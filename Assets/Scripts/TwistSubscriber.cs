@@ -4,27 +4,26 @@ using UnityEngine.UI;
 using TMPro;
 using ROSBridgeSharp.Messages;
 
-namespace ROSBridgeSharp
+public class TwistSubscriber : MonoBehaviour
 {
-    public class TwistSubscriber : BaseSubscriber<Twist>
+    public Text TwistLabel;
+    Twist data;
+
+    private void Awake()
     {
-        public Text TwistLabel;
-        Twist data;
+        RBSubscriber<Twist> s = new RBSubscriber<Twist>("/cmd_vel", Callback);
+    }
+    void Callback(Twist msg)
+    {
+        data = msg;
+    }
 
-        protected override void Start(){
-            base.Start();
-        }
-
-        protected override void ReceiveHandler(Twist message){
-            data = message;
-            isReceived = true;
-        }
-
-        internal void Update(){
-            if (isReceived){
-                TwistLabel.text = "Linear X : " + data.linear.x + "\n" +
-                    "Linear X : " + data.angular.z + "\n";
-            }
+    private void Update()
+    {
+        if (data != null)
+        {
+            TwistLabel.text = "Linear X : " + data.linear.x + "\n";
+            TwistLabel.text += "Linear X : " + data.angular.z + "\n";
         }
     }
 }
