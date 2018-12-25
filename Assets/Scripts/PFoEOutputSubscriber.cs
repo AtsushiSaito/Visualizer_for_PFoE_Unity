@@ -2,6 +2,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 using System.Linq;
+using ROSBridgeSharp;
 using ROSBridgeSharp.Messages;
 
 public class PFoEOutputSubscriber : MonoBehaviour
@@ -53,6 +54,10 @@ public class PFoEOutputSubscriber : MonoBehaviour
             CheckMaxEvent();
             ViewSizeCalculation();
             ProcessMessage();
+        }
+        if (!RBSocket.Instance.IsConnected && EventLength > 1)
+        {
+            EventLength = 1;
         }
     }
 
