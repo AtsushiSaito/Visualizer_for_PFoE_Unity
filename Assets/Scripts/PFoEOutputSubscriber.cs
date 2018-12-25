@@ -21,6 +21,7 @@ public class PFoEOutputSubscriber : MonoBehaviour
     private ParticleSystem.Particle[] Particle;
 
     public Canvas MainCanvas;
+    public GameObject SafeArea;
     public GameObject ParticleFilterObject;
     public ParticleSystem GraphParticleSystem;
 
@@ -58,6 +59,14 @@ public class PFoEOutputSubscriber : MonoBehaviour
         CanvasWidth = MainCanvas.pixelRect.width;
         CanvasHeight = MainCanvas.pixelRect.height;
 
+        RectTransform rectTransform = SafeArea.GetComponent<RectTransform>();
+        Vector2 amax = rectTransform.anchorMax;
+        Vector2 amin = rectTransform.anchorMin;
+
+        float AfterCanvasSizeWidth = (amax.x - amin.x) * CanvasWidth;
+        float AfterCanvasSizeHeight = (amax.y - amin.y) * CanvasHeight;
+        //Debug.Log(CanvasWidth + ":" + AfterCanvasSizeWidth);
+
         // ParticleFilterオブジェクトの相対位置を計算
         ParticleFilterObjectDeltaX = ParticleFilterObject.GetComponent<RectTransform>().sizeDelta.x;
         ParticleFilterObjectDeltaY = ParticleFilterObject.GetComponent<RectTransform>().sizeDelta.y;
@@ -66,7 +75,7 @@ public class PFoEOutputSubscriber : MonoBehaviour
         GraphPSDeltaX = GraphParticleSystem.GetComponent<RectTransform>().sizeDelta.x;
         GraphPSDeltaY = GraphParticleSystem.GetComponent<RectTransform>().sizeDelta.y;
 
-        return new Vector2(CanvasWidth + ParticleFilterObjectDeltaX + GraphPSDeltaX, CanvasHeight + ParticleFilterObjectDeltaY + GraphPSDeltaY);
+        return new Vector2(AfterCanvasSizeWidth + ParticleFilterObjectDeltaX + GraphPSDeltaX, CanvasHeight + ParticleFilterObjectDeltaY + GraphPSDeltaY);
     }
 
     internal void ProcessMessage()
