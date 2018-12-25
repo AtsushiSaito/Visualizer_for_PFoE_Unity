@@ -81,7 +81,7 @@ public class PFoEOutputSubscriber : MonoBehaviour
 
         // パーティクルシステムを表示する領域を設定
         ParticleSystemSize.x = AfterCanvasSizeWidth + ParticleFilterObjectDeltaX + GraphPSDeltaX;
-        ParticleSystemSize.y = CanvasHeight + ParticleFilterObjectDeltaY + GraphPSDeltaY;
+        ParticleSystemSize.y = AfterCanvasSizeHeight + ParticleFilterObjectDeltaY + GraphPSDeltaY;
     }
 
     private void ProcessMessage()
