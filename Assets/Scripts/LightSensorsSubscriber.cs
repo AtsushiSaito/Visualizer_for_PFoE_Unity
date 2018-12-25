@@ -25,7 +25,7 @@ public class LightSensorsSubscriber : MonoBehaviour
                    "Left Side : " + data.left_side.ToString() + "\n" +
                    "Left Forward : " + data.left_forward.ToString() + "\n" +
                    "Right Forward : " + data.right_forward.ToString() + "\n" +
-                   "Right Side : " + data.right_side.ToString() + "\n";
+                   "Right Side : " + data.right_side.ToString();
         }
     }
 }
