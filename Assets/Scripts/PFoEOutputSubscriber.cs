@@ -6,37 +6,37 @@ using ROSBridgeSharp.Messages;
 
 public class PFoEOutputSubscriber : MonoBehaviour
 {
-    public Text PFoEOutputLabel;
     ROSBridgeSharp.Messages.PFoEOutput data;
 
-    private int n_particle = 1000;
-    private int n_event = 0;
-    private int mode_event = -1;
+    private int N_Particle = 1000;
+    private int EventLength = 0;
+    private int ModeEvent = -1;
 
     private float Scale = 3.0f;
     private float CanvasWidth, CanvasHeight;
     private float ParticleFilterObjectDeltaX, ParticleFilterObjectDeltaY;
     private float GraphPSDeltaX, GraphPSDeltaY;
+    private Vector2 ParticleSystemSize;
+    private ParticleSystem.Particle[] Particles;
 
-    private ParticleSystem.Particle[] Particle;
+    private int[] CountedParticleArray;
 
+    public Text PFoEOutputLabel;
     public Canvas MainCanvas;
     public GameObject SafeArea;
     public GameObject ParticleFilterObject;
     public ParticleSystem GraphParticleSystem;
-
-    public Slider slider;
-
-    private Vector2 ParticleSystemSize;
-
+    public Slider ParticleVolumeSlider;
 
     private void Awake()
     {
+        // サブスクライブを定義
         RBSubscriber<PFoEOutput> s = new RBSubscriber<PFoEOutput>("/pfoe_out", Callback);
-        ParticleSystemSize = CalcSize();
+        ViewSizeCalculation();
         Application.targetFrameRate = 60;
     }
-    void Callback(PFoEOutput msg)
+
+    private void Callback(PFoEOutput msg)
     {
         data = msg;
     }
@@ -45,27 +45,31 @@ public class PFoEOutputSubscriber : MonoBehaviour
     {
         if (data != null)
         {
-            PFoEOutputLabel.text = "Eta : " + data.eta.ToString() + "\n" +
-                            "Estimate Event : " + (n_event - 1).ToString();
-            MaxEvent();
-            ParticleSystemSize = CalcSize();
+            // ラベルの更新
+            PFoEOutputLabel.text = "Eta : " + data.eta.ToString() + "\n";
+            PFoEOutputLabel.text += "Estimate Event : " + (EventLength - 1).ToString();
+
+            // 各計算
+            CheckMaxEvent();
+            ViewSizeCalculation();
             ProcessMessage();
         }
     }
 
-    Vector2 CalcSize()
+    private void ViewSizeCalculation()
     {
         // Canvasのサイズを計算
         CanvasWidth = MainCanvas.pixelRect.width;
         CanvasHeight = MainCanvas.pixelRect.height;
 
+        //セーフエリアのオブジェクトを取得して、アンカーポイントを取得
         RectTransform rectTransform = SafeArea.GetComponent<RectTransform>();
         Vector2 amax = rectTransform.anchorMax;
         Vector2 amin = rectTransform.anchorMin;
 
+        //取得したアンカーポイントから実際の表示領域を計算
         float AfterCanvasSizeWidth = (amax.x - amin.x) * CanvasWidth;
         float AfterCanvasSizeHeight = (amax.y - amin.y) * CanvasHeight;
-        //Debug.Log(CanvasWidth + ":" + AfterCanvasSizeWidth);
 
         // ParticleFilterオブジェクトの相対位置を計算
         ParticleFilterObjectDeltaX = ParticleFilterObject.GetComponent<RectTransform>().sizeDelta.x;
@@ -75,66 +79,84 @@ public class PFoEOutputSubscriber : MonoBehaviour
         GraphPSDeltaX = GraphParticleSystem.GetComponent<RectTransform>().sizeDelta.x;
         GraphPSDeltaY = GraphParticleSystem.GetComponent<RectTransform>().sizeDelta.y;
 
-        return new Vector2(AfterCanvasSizeWidth + ParticleFilterObjectDeltaX + GraphPSDeltaX, CanvasHeight + ParticleFilterObjectDeltaY + GraphPSDeltaY);
+        // パーティクルシステムを表示する領域を設定
+        ParticleSystemSize.x = AfterCanvasSizeWidth + ParticleFilterObjectDeltaX + GraphPSDeltaX;
+        ParticleSystemSize.y = CanvasHeight + ParticleFilterObjectDeltaY + GraphPSDeltaY;
     }
 
-    internal void ProcessMessage()
+    private void ProcessMessage()
     {
-        GraphParticleSystem.Emit(n_event);
-        Particle = new ParticleSystem.Particle[n_event];
-
-        GraphParticleSystem.GetParticles(Particle);
+        // パーティクルの放出
+        GraphParticleSystem.Emit(EventLength);
+        // EventLength個のパーティクルを生成
+        Particles = new ParticleSystem.Particle[EventLength];
+        // パーティクルを取り出す
+        GraphParticleSystem.GetParticles(Particles);
+        // パーティクルの動作を停止させる
         GraphParticleSystem.Pause();
 
-        int[] pe = countParticle(data.particles_pos);
+        // イベントの出現頻度を計算
+        CountParticle();
 
-        float Resolution = (ParticleSystemSize.x - 2) / (n_event - 1);
+        // グラフの解像度(棒の幅)
+        float Resolution = (ParticleSystemSize.x - 2) / (EventLength - 1);
 
-        for (int i = 0; i < n_event; i++)
+        for (int i = 0; i < EventLength; i++)
         {
-            Particle[i].position = UnityEngine.Vector3.Lerp(Particle[i].position, new UnityEngine.Vector3(-(ParticleSystemSize.x * 0.5f) + (i * Resolution), pe[i] * 0.5f * Scale), 0.2f);
-            Particle[i].startSize3D = UnityEngine.Vector3.Lerp(Particle[i].startSize3D, new Vector2(Resolution * 0.6f, pe[i] * Scale), 0.2f);
+            // 変化後の座標を計算
+            Vector2 AfterChangePosition = new UnityEngine.Vector3(-(ParticleSystemSize.x * 0.5f) + (i * Resolution), CountedParticleArray[i] * 0.5f * Scale);
+            Particles[i].position = UnityEngine.Vector3.Lerp(Particles[i].position, AfterChangePosition, 0.2f);
 
-            if (mode_event == i)
+            // 変化後のスケールを計算
+            Vector2 AfterChangeSize = new Vector2(Resolution * 0.6f, CountedParticleArray[i] * Scale);
+            Particles[i].startSize3D = UnityEngine.Vector3.Lerp(Particles[i].startSize3D, AfterChangeSize, 0.2f);
+
+            if (ModeEvent == i)
             {
-                Particle[i].startColor = Color.magenta;
+                // モードだけマゼンタで色付け
+                Particles[i].startColor = Color.magenta;
             }
             else
             {
-                Particle[i].startColor = Color.white;
+                // モード以外は白で色付け
+                Particles[i].startColor = Color.white;
             }
         }
-        GraphParticleSystem.SetParticles(Particle, n_event);
+        GraphParticleSystem.SetParticles(Particles, EventLength);
     }
-    internal void MaxEvent()
+
+    // 最大イベントの計算
+    private void CheckMaxEvent()
     {
-        int maxValue = data.particles_pos.Max();
-        if (n_event < maxValue)
+        int maxEvent = data.particles_pos.Max();
+        if (EventLength < maxEvent)
         {
-            n_event = maxValue;
+            // イベントの長さを更新
+            EventLength = maxEvent;
+            // イベントの長さ+1で配列初期化
+            CountedParticleArray = new int[EventLength + 1];
         }
     }
 
+    // グラフのボリューム調整
     public void ChangeSlider()
     {
-        Scale = slider.value;
-        Debug.Log(slider.value);
+        Scale = ParticleVolumeSlider.value;
     }
 
-    internal int[] countParticle(int[] p)
+    // イベントの出現頻度を計算
+    private void CountParticle()
     {
-        int[] a = new int[n_event + 1];
         int counter = 0;
-        for (int i = 0; i < n_event + 1; i++) { a[i] = 0; }
-        for (int i = 0; i < n_particle; i++)
+        for (int i = 0; i < EventLength + 1; i++) { CountedParticleArray[i] = 0; }
+        for (int i = 0; i < N_Particle; i++)
         {
-            a[p[i]] += 1;
-            if (counter < a[p[i]])
+            CountedParticleArray[data.particles_pos[i]] += 1;
+            if (counter < CountedParticleArray[data.particles_pos[i]])
             {
-                counter = a[p[i]];
-                mode_event = p[i];
+                counter = CountedParticleArray[data.particles_pos[i]];
+                ModeEvent = data.particles_pos[i];
             }
         }
-        return a;
     }
 }
