@@ -31,7 +31,7 @@ public class PFoEOutputSubscriber : MonoBehaviour
     private void Awake()
     {
         // サブスクライブを定義
-        RBSubscriber<PFoEOutput> s = new RBSubscriber<PFoEOutput>("/pfoe_out", Callback);
+        new RBSubscriber<PFoEOutput>("/pfoe_out", Callback);
         ViewSizeCalculation();
         Application.targetFrameRate = 60;
     }

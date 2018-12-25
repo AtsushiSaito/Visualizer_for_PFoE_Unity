@@ -11,7 +11,7 @@ public class TwistSubscriber : MonoBehaviour
 
     private void Awake()
     {
-        RBSubscriber<Twist> s = new RBSubscriber<Twist>("/cmd_vel", Callback);
+        new RBSubscriber<Twist>("/cmd_vel", Callback);
     }
     void Callback(Twist msg)
     {

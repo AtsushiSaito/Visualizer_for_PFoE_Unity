@@ -10,7 +10,7 @@ public class LightSensorsSubscriber : MonoBehaviour
 
     private void Awake()
     {
-        RBSubscriber<LightSensorValues> s = new RBSubscriber<LightSensorValues>("/lightsensors", Callback);
+        new RBSubscriber<LightSensorValues>("/lightsensors", Callback);
     }
     void Callback(LightSensorValues msg)
     {
