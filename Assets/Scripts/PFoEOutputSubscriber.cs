@@ -48,7 +48,8 @@ public class PFoEOutputSubscriber : MonoBehaviour
         {
             // ラベルの更新
             PFoEOutputLabel.text = "Eta : " + data.eta.ToString() + "\n";
-            PFoEOutputLabel.text += "Estimate Event : " + (EventLength - 1).ToString();
+            PFoEOutputLabel.text += "Estimate Event : " + (EventLength - 1).ToString() + "\n";
+            PFoEOutputLabel.text += "Mode Event : " + ModeEvent.ToString();
 
             // 各計算
             CheckMaxEvent();
