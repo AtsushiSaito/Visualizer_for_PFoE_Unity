@@ -23,7 +23,7 @@ public class TwistSubscriber : MonoBehaviour
         if (data != null)
         {
             TwistLabel.text = "Linear X : " + data.linear.x + "\n";
-            TwistLabel.text += "Linear X : " + data.angular.z;
+            TwistLabel.text += "Angular Z : " + data.angular.z;
         }
     }
 }
