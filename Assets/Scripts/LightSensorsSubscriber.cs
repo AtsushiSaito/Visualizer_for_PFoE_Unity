@@ -1,31 +1,27 @@
-﻿using UnityEngine;
-using System.Collections;
+﻿using System.Collections;
+using RBS;
+using RBS.Messages;
+using UnityEngine;
 using UnityEngine.UI;
-using ROSBridgeSharp.Messages;
 
-public class LightSensorsSubscriber : MonoBehaviour
-{
+public class LightSensorsSubscriber : MonoBehaviour {
     public Text LightSensorValuesLabel;
-    LightSensorValues data;
+    RBS.Messages.raspimouse_ros_2.LightSensorValues data;
 
-    private void Awake()
-    {
-        new RBSubscriber<LightSensorValues>("/lightsensors", Callback);
+    private void Awake () {
+        new RBSubscriber<RBS.Messages.raspimouse_ros_2.LightSensorValues> ("/lightsensors", CallBack);
     }
-    void Callback(LightSensorValues msg)
-    {
+    void CallBack (RBS.Messages.raspimouse_ros_2.LightSensorValues msg) {
         data = msg;
     }
 
-    private void Update()
-    {
-        if (data != null)
-        {
+    private void Update () {
+        if (data != null) {
             LightSensorValuesLabel.text =
-                   "Left Side : " + data.left_side.ToString() + "\n" +
-                   "Left Forward : " + data.left_forward.ToString() + "\n" +
-                   "Right Forward : " + data.right_forward.ToString() + "\n" +
-                   "Right Side : " + data.right_side.ToString();
+                "right_forward : " + data.right_forward.ToString () + "\n" +
+                "right_side: " + data.right_side.ToString () + "\n" +
+                "left_side : " + data.left_side.ToString () + "\n" +
+                "left_forward : " + data.left_forward.ToString ();
         }
     }
 }

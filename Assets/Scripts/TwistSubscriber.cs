@@ -1,18 +1,20 @@
-﻿using UnityEngine;
-using System.Collections;
+﻿using System.Collections;
+using RBS;
+using RBS.Messages;
+using UnityEngine;
 using UnityEngine.UI;
-using ROSBridgeSharp.Messages;
 
 public class TwistSubscriber : MonoBehaviour
 {
     public Text TwistLabel;
-    Twist data;
+    RBS.Messages.geometry_msgs.Twist data;
 
     private void Awake()
     {
-        new RBSubscriber<Twist>("/cmd_vel", Callback);
+        new RBSubscriber<RBS.Messages.geometry_msgs.Twist>("/cmd_vel", CallBack);
     }
-    void Callback(Twist msg)
+
+    void CallBack(RBS.Messages.geometry_msgs.Twist msg)
     {
         data = msg;
     }
@@ -21,8 +23,8 @@ public class TwistSubscriber : MonoBehaviour
     {
         if (data != null)
         {
-            TwistLabel.text = "Linear X : " + data.linear.x + "\n";
-            TwistLabel.text += "Angular Z : " + data.angular.z;
+            TwistLabel.text = "linear.x : " + data.linear.x.ToString("F4") + "\n";
+            TwistLabel.text += "angular.z : " + data.angular.z.ToString("F4");
         }
     }
 }

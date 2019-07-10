@@ -173,7 +173,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 156671930}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 51b1b98e19e2f41a48d6919fa5b3f3c1, type: 3}
+  m_Script: {fileID: 11500000, guid: e59887b9a0f8f411280518ca89c7cce4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   isAutoScale: 0
@@ -6651,7 +6651,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1927541603}
+      - m_Target: {fileID: 1927541599}
         m_MethodName: PushButton
         m_Mode: 1
         m_Arguments:
@@ -7488,10 +7488,14 @@ MonoBehaviour:
   m_GameObject: {fileID: 1927541598}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a065c831b85cd4089bd779f04603417f, type: 3}
+  m_Script: {fileID: 11500000, guid: 66a44701a04424e3eb75a68b416ad5e6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  LightSensorValuesLabel: {fileID: 1565496751}
+  ConnectButton: {fileID: 1458408942}
+  IPADDR: {fileID: 1730421893}
+  PORT: {fileID: 1475888800}
+  DialogWindow: {fileID: 227437996}
+  DialogText: {fileID: 285203447}
 --- !u!4 &1927541600
 Transform:
   m_ObjectHideFlags: 0
@@ -7515,7 +7519,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 1927541598}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f11f9b184a0804a81abf2767e7f02bfa, type: 3}
+  m_Script: {fileID: 11500000, guid: 30cdc4da4af3e4cc6bf0ff956fdb61b3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   TwistLabel: {fileID: 231188430}
@@ -7528,7 +7532,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 1927541598}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b446a8d07f9b644b1a0b4469200abb47, type: 3}
+  m_Script: {fileID: 11500000, guid: 30631b65b30ca4669be0cf116045f06f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   PFoEOutputLabel: {fileID: 1841398956}
@@ -7546,14 +7550,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 1927541598}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 100832f7aa28b41b5b969c6a9a3cffb4, type: 3}
+  m_Script: {fileID: 11500000, guid: 9c14d05c157ce4e99bc9a187acee5e72, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ConnectButton: {fileID: 1458408942}
-  IPADDR: {fileID: 1730421893}
-  PORT: {fileID: 1475888800}
-  DialogWindow: {fileID: 227437996}
-  DialogText: {fileID: 285203447}
+  LightSensorValuesLabel: {fileID: 1565496751}
 --- !u!114 &1927541604
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -7566,10 +7566,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bbcd1582791ca47d2bdffdd9b67f6d24, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  IPAddress: 192.168.2.210
-  Port: 9000
+  IPAddress: 192.168.2.1
+  Port: 9090
   AutoConnect: 0
-  ConnectWaitTime: 1
+  ConnectWaitTime: 2.5
 --- !u!114 &1927541605
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -7579,7 +7579,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 1927541598}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3e6454e85ffa546fca1db6b78e03253a, type: 3}
+  m_Script: {fileID: 11500000, guid: 0c3eb9581299f474da5da21c6492fa77, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   TimeText: {fileID: 2126230024}

@@ -2,56 +2,77 @@
 using System.Collections;
 using UnityEngine.UI;
 using System.Threading;
-using ROSBridgeSharp;
-using ROSBridgeSharp.Messages;
+using RBS;
+using RBS.Messages;
 using System;
+
+[System.Serializable]
+public class ConnectData
+{
+    public string IPAddress;
+    public string Port;
+    public float slider_values;
+}
 
 public class ROSConnector : MonoBehaviour
 {
     public Button ConnectButton;
-    public Button DisconnectButton;
     public InputField IPADDR;
     public InputField PORT;
 
     public GameObject DialogWindow;
     public Text DialogText;
 
-    void ToggleButton()
+    private string SaveKey = "ConnectionInfo";
+    private string LastInputIP, LastInputPort;
+    private ConnectData connect_data;
+
+    void Update()
     {
-        DisconnectButton.interactable = !DisconnectButton.interactable;
-        ConnectButton.interactable = !ConnectButton.interactable;
+        LastInputIP = IPADDR.text;
+        LastInputPort = PORT.text;
     }
 
     void Start()
     {
-        // プレスホルダーの値を初期値に設定
+        if (PlayerPrefs.HasKey(SaveKey))
+        {
+            string data = PlayerPrefs.GetString(SaveKey, "");
+            connect_data = JsonUtility.FromJson<ConnectData>(data);
+            IPADDR.placeholder.GetComponent<Text>().text = connect_data.IPAddress;
+            PORT.placeholder.GetComponent<Text>().text = connect_data.Port;
+        }
+        else
+        {
+            connect_data = new ConnectData();
+            connect_data.IPAddress = IPADDR.placeholder.GetComponent<Text>().text;
+            connect_data.Port = PORT.placeholder.GetComponent<Text>().text;
+            string data = JsonUtility.ToJson(connect_data); // JSONに変換
+            PlayerPrefs.SetString(SaveKey, data);
+        }
+
         IPADDR.text = IPADDR.placeholder.GetComponent<Text>().text;
         PORT.text = PORT.placeholder.GetComponent<Text>().text;
-
-        // ボタンの状態の初期設定
-        DisconnectButton.interactable = false;
-        ConnectButton.interactable = true;
-
-        ColorBlock DisconnectColor = DisconnectButton.colors;
-        DisconnectColor.disabledColor = Color.white;
-        DisconnectColor.normalColor = Color.gray;
-        DisconnectColor.highlightedColor = Color.gray;
-        DisconnectButton.colors = DisconnectColor;
-
-        ColorBlock ConnectColor = ConnectButton.colors;
-        ConnectColor.disabledColor = Color.white;
-        ConnectColor.normalColor = Color.gray;
-        ConnectColor.highlightedColor = Color.gray;
-        ConnectButton.colors = ConnectColor;
     }
 
-    public void DisconnectionButton()
+    public void PushButton()
+    {
+        if (RBSocket.Instance.IsConnected)
+        {
+            Disconnection();
+        }
+        else
+        {
+            Connection();
+        }
+    }
+
+    public void Disconnection()
     {
         if (RBSocket.Instance.IsConnected)
         {
             RBSocket.Instance.Disconnect();
-            DisconnectButton.interactable = false;
-            ConnectButton.interactable = true;
+            ConnectButton.GetComponentInChildren<Text>().text = "Connect";
             AddDialogMessage("Connection Closed.");
         }
     }
@@ -61,10 +82,30 @@ public class ROSConnector : MonoBehaviour
         DialogText.text = "【" + System.DateTime.Now.ToString() + " " + RBSocket.Instance.IPAddress + ":" + RBSocket.Instance.Port + "】" + m + "\n" + DialogText.text;
     }
 
-    public void ConnectionButton()
+    public void Connection()
     {
-        RBSocket.Instance.IPAddress = IPADDR.text;
-        RBSocket.Instance.Port = PORT.text;
+        if (connect_data.IPAddress == LastInputIP)
+        {
+            RBSocket.Instance.IPAddress = connect_data.IPAddress;
+        }
+        else
+        {
+            RBSocket.Instance.IPAddress = LastInputIP;
+            connect_data.IPAddress = LastInputIP;
+        }
+
+        if (connect_data.Port == LastInputPort)
+        {
+            RBSocket.Instance.Port = connect_data.Port;
+        }
+        else
+        {
+            RBSocket.Instance.Port = LastInputPort;
+            connect_data.Port = LastInputPort;
+        }
+
+        string data = JsonUtility.ToJson(connect_data); // JSONに変換
+        PlayerPrefs.SetString(SaveKey, data);
 
         if (!RBSocket.Instance.IsConnected)
         {
@@ -73,7 +114,7 @@ public class ROSConnector : MonoBehaviour
             if (RBSocket.Instance.IsConnected)
             {
                 AddDialogMessage("Connection Successful.");
-                ToggleButton();
+                ConnectButton.GetComponentInChildren<Text>().text = "Disconnect";
             }
             else
             {

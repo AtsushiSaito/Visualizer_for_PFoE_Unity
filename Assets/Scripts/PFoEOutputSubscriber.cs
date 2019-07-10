@@ -1,13 +1,13 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections;
+using System.Linq;
+using RBS;
+using RBS.Messages;
 using UnityEngine;
 using UnityEngine.UI;
-using System.Linq;
-using ROSBridgeSharp;
-using ROSBridgeSharp.Messages;
 
 public class PFoEOutputSubscriber : MonoBehaviour
 {
-    ROSBridgeSharp.Messages.PFoEOutput data;
+    RBS.Messages.raspimouse_gamepad_teach_and_replay.PFoEOutput data;
 
     private int N_Particle = 1000;
     private int EventLength = 0;
@@ -32,12 +32,12 @@ public class PFoEOutputSubscriber : MonoBehaviour
     private void Awake()
     {
         // サブスクライブを定義
-        new RBSubscriber<PFoEOutput>("/pfoe_out", Callback);
+        new RBSubscriber<RBS.Messages.raspimouse_gamepad_teach_and_replay.PFoEOutput>("/pfoe_out", Callback);
         ViewSizeCalculation();
         Application.targetFrameRate = 60;
     }
 
-    private void Callback(PFoEOutput msg)
+    private void Callback(RBS.Messages.raspimouse_gamepad_teach_and_replay.PFoEOutput msg)
     {
         data = msg;
     }
@@ -47,9 +47,9 @@ public class PFoEOutputSubscriber : MonoBehaviour
         if (data != null)
         {
             // ラベルの更新
-            PFoEOutputLabel.text = "Eta : " + data.eta.ToString() + "\n";
-            PFoEOutputLabel.text += "Estimate Event : " + (EventLength - 1).ToString() + "\n";
-            PFoEOutputLabel.text += "Mode Event : " + ModeEvent.ToString();
+            PFoEOutputLabel.text = "eta : " + data.eta.ToString() + "\n";
+            PFoEOutputLabel.text += "events : " + (EventLength - 1).ToString() + "\n";
+            PFoEOutputLabel.text += "mode event : " + ModeEvent.ToString();
 
             // 各計算
             CheckMaxEvent();
@@ -134,7 +134,7 @@ public class PFoEOutputSubscriber : MonoBehaviour
     // 最大イベントの計算
     private void CheckMaxEvent()
     {
-        int maxEvent = data.particles_pos.Max();
+        int maxEvent = (int)data.particles_pos.Max();
         if (EventLength < maxEvent)
         {
             // イベントの長さを更新
@@ -161,7 +161,7 @@ public class PFoEOutputSubscriber : MonoBehaviour
             if (counter < CountedParticleArray[data.particles_pos[i]])
             {
                 counter = CountedParticleArray[data.particles_pos[i]];
-                ModeEvent = data.particles_pos[i];
+                ModeEvent = (int)data.particles_pos[i];
             }
         }
     }
