@@ -7,7 +7,7 @@ using UnityEngine.UI;
 
 public class PFoEOutputSubscriber : MonoBehaviour
 {
-    RBS.Messages.raspimouse_gamepad_teach_and_replay.PFoEOutput data;
+    RBS.Messages.raspimouse_gamepad_teach_and_replay_msgs.PFInformation data;
 
     private int N_Particle = 1000;
     private int EventLength = 0;
@@ -32,12 +32,12 @@ public class PFoEOutputSubscriber : MonoBehaviour
     private void Awake()
     {
         // サブスクライブを定義
-        new RBSubscriber<RBS.Messages.raspimouse_gamepad_teach_and_replay.PFoEOutput>("/pfoe_out", Callback);
+        new RBSubscriber<RBS.Messages.raspimouse_gamepad_teach_and_replay_msgs.PFInformation>("/pfoe_info", Callback);
         ViewSizeCalculation();
         Application.targetFrameRate = 60;
     }
 
-    private void Callback(RBS.Messages.raspimouse_gamepad_teach_and_replay.PFoEOutput msg)
+    private void Callback(RBS.Messages.raspimouse_gamepad_teach_and_replay_msgs.PFInformation msg)
     {
         data = msg;
     }
@@ -134,7 +134,7 @@ public class PFoEOutputSubscriber : MonoBehaviour
     // 最大イベントの計算
     private void CheckMaxEvent()
     {
-        int maxEvent = (int)data.particles_pos.Max();
+        int maxEvent = (int)data.positions.Max();
         if (EventLength < maxEvent)
         {
             // イベントの長さを更新
@@ -157,11 +157,11 @@ public class PFoEOutputSubscriber : MonoBehaviour
         for (int i = 0; i < EventLength + 1; i++) { CountedParticleArray[i] = 0; }
         for (int i = 0; i < N_Particle; i++)
         {
-            CountedParticleArray[data.particles_pos[i]] += 1;
-            if (counter < CountedParticleArray[data.particles_pos[i]])
+            CountedParticleArray[data.positions[i]] += 1;
+            if (counter < CountedParticleArray[data.positions[i]])
             {
-                counter = CountedParticleArray[data.particles_pos[i]];
-                ModeEvent = (int)data.particles_pos[i];
+                counter = CountedParticleArray[data.positions[i]];
+                ModeEvent = (int)data.positions[i];
             }
         }
     }
